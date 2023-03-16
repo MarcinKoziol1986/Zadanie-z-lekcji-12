@@ -79,10 +79,16 @@ pprint.pprint(dane)
 if not zapytanie.ok:
     print(f"Blad API {zapytanie.status_code}")
     quit()
-
-for pogoda in zapytanie.json()['daily']:
-    deszcz = ['rain_sum']
-    print(pogoda['rain_sum'])
-
-with open('historia.txt','w'):
-    
+pogoda = []
+for p in zapytanie.json()['daily']['rain_sum']:
+    pogoda.append(float(p))
+    print(pogoda)
+    if p == 0.0:
+        print('Nie Padalo w Tym Dniu')
+    if p > 0.0:
+        print('Padalo w Tym Dniu')
+    if p < 0.0:
+        print('Blad')
+    with open('output.txt','w') as plik:
+        #while True:
+           # plik.write(f"{p}")
