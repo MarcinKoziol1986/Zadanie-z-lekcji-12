@@ -65,17 +65,39 @@ def sprawdz_date(dstr: str) -> bool:
     if day not in mozliwe_dni:
         return False
     return True
+def data_istnieje_w_pliku():
+    data_jest_juz_w_wpliku = False
+    with open("output.txt", "r") as file:
+         for line in file.readlines():
+             if searched_date:
+                data_jest_juz_w_wpliku = True
+                return data_jest_juz_w_wpliku
+
 
 
 latitude = '52.237049'
 longitude = '21.017532'
 searched_date = input("Podaj Date: ")
-URL = f'https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}' \
-      f'&hourly=rain&daily=rain_sum&timezone=Europe%2FLondon&start_date={searched_date}' \
-      f'&end_date={searched_date}'
-zapytanie = requests.get(URL)
-dane = zapytanie.json()
+if not data_istnieje_w_pliku():
+
+    URL = f'https://api.open-meteo.com/v1/forecast?latitude={latitude}' \
+          f'&longitude={longitude}&hourly=rain&daily=rain_sum&timezone=Europe%2F' \
+          f'London&start_date={searched_date}' \
+          f'&end_date={searched_date}'
+    zapytanie = requests.get(URL)
+    dane = zapytanie.json()
+
+else:
+    URL = f'https://api.open-meteo.com/v1/forecast?latitude={latitude}' \
+          f'&longitude={longitude}' \
+          f'&hourly=rain&daily=rain_sum&timezone=Europe%2F' \
+          f'London&start_date={searched_date}' \
+          f'&end_date={searched_date}'
+    zapytanie = requests.get(URL)
+    dane = zapytanie.json()
+
 pprint.pprint(dane)
+
 if not zapytanie.ok:
     print(f"Blad API {zapytanie.status_code}")
     quit()
