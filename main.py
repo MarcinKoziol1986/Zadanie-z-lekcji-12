@@ -65,20 +65,22 @@ def sprawdz_date(dstr: str) -> bool:
     if day not in mozliwe_dni:
         return False
     return True
-def data_istnieje_w_pliku():
-    data_jest_juz_w_wpliku = False
+def data_istnieje_w_pliku(searched_date):
     with open("output.txt", "r") as file:
          for line in file.readlines():
-             if searched_date:
-                data_jest_juz_w_wpliku = True
-                return data_jest_juz_w_wpliku
+             if searched_date in line:
+                return line
+    return False
 
 
 
 latitude = '52.237049'
 longitude = '21.017532'
 searched_date = input("Podaj Date: ")
-if not data_istnieje_w_pliku():
+pogoda = data_istnieje_w_pliku(searched_date)
+if pogoda:
+    print(pogoda)
+else:
 
     URL = f'https://api.open-meteo.com/v1/forecast?latitude={latitude}' \
           f'&longitude={longitude}&hourly=rain&daily=rain_sum&timezone=Europe%2F' \
@@ -87,31 +89,22 @@ if not data_istnieje_w_pliku():
     zapytanie = requests.get(URL)
     dane = zapytanie.json()
 
-else:
-    URL = f'https://api.open-meteo.com/v1/forecast?latitude={latitude}' \
-          f'&longitude={longitude}' \
-          f'&hourly=rain&daily=rain_sum&timezone=Europe%2F' \
-          f'London&start_date={searched_date}' \
-          f'&end_date={searched_date}'
-    zapytanie = requests.get(URL)
-    dane = zapytanie.json()
+    pprint.pprint(dane)
 
-pprint.pprint(dane)
-
-if not zapytanie.ok:
-    print(f"Blad API {zapytanie.status_code}")
-    quit()
-pogoda = []
-time = []
-for p in zapytanie.json()['daily']['rain_sum']:
-    pogoda.append(float(p))
-    print(pogoda)
-    if p == 0.0:
-        print(f"Nie Padalo w Tym Dniu ")
-    if p > 0.0:
-        print(f"Padalo w Tym Dniu")
-    if p < 0.0:
-        print('Blad')
-    with open('output.txt','a') as plik:
-        if True:
-            plik.write(f"Opady deszczu {p} ml,W {searched_date}\n")
+    if not zapytanie.ok:
+        print(f"Blad API {zapytanie.status_code}")
+        quit()
+    pogoda = []
+    time = []
+    for p in zapytanie.json()['daily']['rain_sum']:
+        pogoda.append(float(p))
+        print(pogoda)
+        if p == 0.0:
+            print(f"Nie Padalo w Tym Dniu ")
+        if p > 0.0:
+            print(f"Padalo w Tym Dniu")
+        if p < 0.0:
+            print('Blad')
+        with open('output.txt','a') as plik:
+            if True:
+                plik.write(f"Opady deszczu {p} ml,W {searched_date}\n")
